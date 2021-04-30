@@ -26,23 +26,23 @@ N = 1000           #nb of dats in both train and test dataset
 
 # ----- Main ----- #
 train_points, train_labels, test_points, test_labels = datasets.generate_circle_dataset(N)
-train_points = train_points.reshape((-1,))
 
 seq = modules.Sequential()
 
-seq.append(layers.FCLayer(2000, 1000, True))
+seq.append(layers.FCLayer(2, 25, True))
 seq.append(act.Tanh())
-seq.append(layers.FCLayer(1000, 500, True))
+seq.append(layers.FCLayer(25, 25, True))
 seq.append(act.ReLU())
-seq.append(layers.FCLayer(500, 2, False))
-seq.append(act.Tanh())
-seq.append(layers.FCLayer(2, 1, True))
+seq.append(layers.FCLayer(25, 1, False))
+
 
 print(seq.param())
 
 seq.names()
 
-print(seq.forward(train_points))
+print(seq.forward(train_points[0,:]))
+
+seq.backward(loss.dMSE(test_labels[0].view(1,-1), test_labels[1].view(1,-1)))
 
 
 

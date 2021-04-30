@@ -22,15 +22,27 @@ class FCLayer(Module):
         self.name = "FC Layer with input "+str(input_w)+", output "+str(output_w)+" and bias set to "+str(bias)
         self.bias = bias
         self.W = empty(size=(output_w, input_w)).normal_()      #weights of the layer
+        self.input = empty(size=(input_w,1))
+        self.output = empty(size=(output_w,1))
+        self.dl_dw = empty(size=(output_w, input_w))
         if bias:
             self.b = empty(output_w).normal_()                  #bias of the layer
+            self.dl_db = empty(output_w)
 
     def forward(self, input):
+        self.input = input
+        self.output = self.W.matmul(input)
         if self.bias:
-            return self.W.matmul(input) + self.b
-        else:
-            return self.W.matmul(input)
-    
+            self.output += self.b
+        return self.output
+
+
+    def backward(self, gradwrtoutput):
+        self.dl_dw.add_(gradwrtoutput.view(-1, 1).matmul(self.input.view(1, -1)))
+        if self.bias:
+            self.dl_db.add_(gradwrtoutput)
+        return self.W.t().matmul(gradwrtoutput).squeeze()
+
     def param(self):
         params = []
         params.append((self.W,self.W))        #TODO 2nd is supposed to be the gradient

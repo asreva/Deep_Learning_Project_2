@@ -37,7 +37,12 @@ class Sequential(Module):
         for layer in self.layers:
             input=layer.forward(input)
         return input
-        
+
+    def backward(self, gradwrtoutput):
+        for layer in self.layers[::-1]:
+            gradwrtoutput = layer.backward(gradwrtoutput)
+        return input
+
     def param(self):
         params = []
         for layer in self.layers:

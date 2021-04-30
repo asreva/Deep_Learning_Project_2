@@ -9,3 +9,6 @@ def MSE(value, target):
     #Assume first dimension separate the different points (others may be used for dimension)
     
     return ((value - target)**2).sum()/value.shape[0]
+
+def dMSE(value, target):
+    return 2 * (value - target)
