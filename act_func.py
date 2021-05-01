@@ -23,6 +23,8 @@ class Tanh(Module):
     def backward(self, gradwrtoutput):
         return 4 * (self.output.exp() + self.output.mul(-1).exp()).pow(-2) * gradwrtoutput
 
+
+
 #ReLU
 class ReLU(Module):
     #Applies the ReLU activation layer to the input tensor

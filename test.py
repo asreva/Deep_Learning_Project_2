@@ -21,7 +21,8 @@ import modules
 
 # ----- Parameters ----- #
 N = 1000           #nb of dats in both train and test dataset
-
+N_EPOCHS = 1000
+eta = 1e-2
 # ----- Functions ----- #
 
 # ----- Main ----- #
@@ -32,18 +33,31 @@ seq = modules.Sequential()
 seq.append(layers.FCLayer(2, 25, True))
 seq.append(act.Tanh())
 seq.append(layers.FCLayer(25, 25, True))
-seq.append(act.ReLU())
-seq.append(layers.FCLayer(25, 1, False))
-
+seq.append(act.Tanh())
+seq.append(layers.FCLayer(25, 1, True))
+seq.append(act.Tanh())
 
 print(seq.param())
 
 seq.names()
+for epoch in range(N_EPOCHS):
+    err_train = 0
+    err_test = 0
+    for i in range(N):
+        pred_train = seq.forward(train_points[i, :])
 
-print(seq.forward(train_points[0,:]))
+        seq.backward(loss.dMSE(pred_train.view(1, -1), train_labels[i].view(1, -1)))
+        seq.grad_step(eta)
+        if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
+            err_train += 1
 
-seq.backward(loss.dMSE(test_labels[0].view(1,-1), test_labels[1].view(1,-1)))
+        pred_test = seq.forward(test_points[i, :])
+        if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
+            err_test += 1
 
-
+    print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
+    print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
+    # for layer in seq.layers:
+    #     layer.grad_step(eta)
 
 

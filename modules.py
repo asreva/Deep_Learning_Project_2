@@ -21,7 +21,10 @@ class Module(object):
         
     def param(self):
         return []
-    
+
+    def grad_step(self, eta):
+        return
+
 #Sequential
 class Sequential(Module):
     #Sequential class to create sequential networks
@@ -42,6 +45,10 @@ class Sequential(Module):
         for layer in self.layers[::-1]:
             gradwrtoutput = layer.backward(gradwrtoutput)
         return input
+
+    def grad_step(self, eta):
+        for layer in self.layers:
+            layer.grad_step(eta)
 
     def param(self):
         params = []

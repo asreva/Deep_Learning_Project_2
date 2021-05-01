@@ -79,7 +79,7 @@ dl_db1 = torch.empty(b1.size())
 dl_dw2 = torch.empty(w2.size())
 dl_db2 = torch.empty(b2.size())
 
-for k in range(1000):
+for k in range(100):
 
     # Back-prop
 
