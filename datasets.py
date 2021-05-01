@@ -7,6 +7,8 @@
 # ----- Libraries ----- #
 import math
 from torch import empty
+from torch import set_grad_enabled
+set_grad_enabled(False)
 
 # ----- Constants ----- #
 R =  1/math.sqrt(2*math.pi)     #radius of the disk

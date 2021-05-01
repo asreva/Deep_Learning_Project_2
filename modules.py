@@ -4,6 +4,11 @@
 @aim:       Define the common strucutre for the different element of NN
 """
 
+# ----- Libraries ----- #
+#Utils
+from torch import set_grad_enabled
+set_grad_enabled(False)
+
 # ----- Classes definition ----- #
 
 #Basic Module
@@ -60,5 +65,4 @@ class Sequential(Module):
         print(self.name+" with "+str(len(self.layers))+" layers:")
         for layer in self.layers:
             print(layer.name)
-    
-    #TODO: Add backward
+        print("\n")
