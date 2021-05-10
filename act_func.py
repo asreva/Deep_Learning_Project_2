@@ -55,4 +55,4 @@ class Sigmoid(Module):
         return self.output 
 
     def backward(self, gradwrtoutput):
-        return (self.output.sigmoid()*(1-self.output.sigmoid())) * gradwrtoutput
+        return self.output.sigmoid()*(1-self.output.sigmoid()) * gradwrtoutput

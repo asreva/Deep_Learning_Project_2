@@ -15,15 +15,14 @@ import loss
 import layers
 import modules
 
-
-
 # ----- Parameters ----- #
-N = 1000            #nb of dats in both train and test dataset
-N_EPOCHS = 200      #nb of epoch for the train
-eta = 1e-3          #learning rate
-batch_size = 10     #batch size (nb of gradient computation before changing the weight)
-N_ITER = 10         #nb of iter to compute mean and std
-BOOL_SAVE = True    #to save or not the data
+N = 1000           #nb of dats in both train and test dataset
+N_EPOCHS = 20      #nb of epoch for the train
+eta0 = 1e-2        #learning rate
+batch_size = 1     #batch size (nb of gradient computation before changing the weight)
+N_ITER = 10        #nb of iter to compute mean and std
+BOOL_SAVE = False  #to save or not the data
+VERBOSE = True
 
 # ----- Log tables ----- #
 train_perf = []     #final perf train of each iter
@@ -31,10 +30,14 @@ test_perf = []      #fian perf test of each iter
 train_perf_i_e = [] #perf train of each iter along epochs
 test_perf_i_e = []  #perf test of each iter along epochs
 
+improv_count = 0    #used to reduce eta in case of stagnation
+
 # ----- Main ----- #
 #repeat for stat info
 for iter in range(N_ITER):
-    print("\nIter: "+str(iter)+"\n")
+    eta = eta0  # reset learning rate
+    if VERBOSE:
+        print("\nIter: "+str(iter)+"\n")
     
     #Get data
     train_points, train_labels, test_points, test_labels = datasets.generate_circle_dataset(N)
@@ -49,7 +52,7 @@ for iter in range(N_ITER):
     seq.append(layers.FCLayer(25, 25, True))
     seq.append(act.Tanh())
     seq.append(layers.FCLayer(25, 1, True))
-    seq.append(act.Tanh())
+    seq.append(act.Sigmoid())
     
     seq.names()
     
@@ -61,10 +64,7 @@ for iter in range(N_ITER):
             #predict the output and backward the loss
             pred_train = seq.forward(train_points[i, :])
             seq.backward(loss.dMSE(pred_train.view(1, -1), train_labels[i].view(1, -1)))
-            
-            #update the weights after one batch
-            if(i%batch_size == 0):
-                seq.grad_step(eta)
+            seq.grad_step(eta)
             
             #check performance
             if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
@@ -72,9 +72,20 @@ for iter in range(N_ITER):
             pred_test = seq.forward(test_points[i, :])
             if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
                 err_test += 1
-                
-        print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
-        print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
+        if VERBOSE:
+            print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
+            print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
+
+        if epoch > 1: #decrease eta if stagnation
+            improvement = (train_perf_e[epoch-1]-err_train/N)
+            if VERBOSE:
+                print("train improvement  = {:.2%}".format(improvement))
+            if improvement < 0.02:
+                improv_count += 1
+            if improv_count >= 2:
+                eta /= 2
+                improv_count = 0
+
         train_perf_e.append(err_train / N)
         test_perf_e.append(err_test / N)
         
@@ -102,8 +113,9 @@ for iter in range(N_ITER):
     test_perf.append(err_test / N)
     train_perf_i_e.append(train_perf_e)
     test_perf_i_e.append(test_perf_e)
-    print("\nFinal train {} err = {:.2%}".format(epoch, err_train / N))
-    print("Final test {} err = {:.2%}".format(epoch, err_test / N))
+    if VERBOSE:
+        print("\nFinal train {} err = {:.2%}".format(epoch, err_train / N))
+        print("Final test {} err = {:.2%}".format(epoch, err_test / N))
     
 #save in file
 if BOOL_SAVE:
