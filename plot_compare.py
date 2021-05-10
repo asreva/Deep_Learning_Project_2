@@ -11,20 +11,19 @@ plt.close("all")
 import sys
 
 # ----- Parameters ----- #
-PATH = ""
-SAVE_EXTENSIONS = ["", "_torch"]
-NAMES = ["Ours", "Torch"]
+PATHS = ["ours/","ours_no_lr/","pytorch/"]
+NAMES = ["Ours", "Ours (no lr modifs)","Pytorch"]
 COLORS = ["green","blue","red","black"]
 
 fig0, ax0 = plt.subplots()
-for i, SAVE_EXT in enumerate(SAVE_EXTENSIONS):
+for i in range(len(NAMES)):
     if i > len(COLORS):
         sys.exit("ADD COLORS TO COLORS")
     # ----- Loading ----- #
-    test_e = np.genfromtxt(PATH+'test_perf_e'+SAVE_EXT+'.txt', delimiter=' ')
-    train_e = np.genfromtxt(PATH+'train_perf_e'+SAVE_EXT+'.txt', delimiter=' ')
-    test = np.genfromtxt(PATH+'test_perf'+SAVE_EXT+'.txt', delimiter=' ')
-    train = np.genfromtxt(PATH+'train_perf'+SAVE_EXT+'.txt', delimiter=' ')
+    test_e = np.genfromtxt(PATHS[i]+'test_perf_e.txt', delimiter=' ')
+    train_e = np.genfromtxt(PATHS[i]+'train_perf_e.txt', delimiter=' ')
+    test = np.genfromtxt(PATHS[i]+'test_perf.txt', delimiter=' ')
+    train = np.genfromtxt(PATHS[i]+'train_perf.txt', delimiter=' ')
     
     # ----- Stats ----- #
     test_e_m = np.mean(test_e,axis=0)
@@ -44,19 +43,19 @@ for i, SAVE_EXT in enumerate(SAVE_EXTENSIONS):
     #Plot the evolution on all the epochs for each parameter
     plt.figure(2)
     epochs_arr = np.arange(0, len(test_e_m))
-    plt.errorbar(epochs_arr, train_e_m,yerr=test_e_s, label=NAMES[i]+" (train)",capsize=5, color = COLORS[i])
-    plt.errorbar(epochs_arr, test_e_m,yerr=test_e_m, label=NAMES[i]+" (test)", linestyle="--",capsize=5, color = COLORS[i])
+    plt.errorbar(epochs_arr, train_e_m,yerr=train_e_s, label=NAMES[i]+" (train)",capsize=5, color = COLORS[i])
+    plt.errorbar(epochs_arr, test_e_m,yerr=test_e_s, label=NAMES[i]+" (test)", linestyle="--",capsize=5, color = COLORS[i])
 
 
-ax0.set_title("Accuracy for different models, with std")
+ax0.set_title("Error rate for different models, with std")
 ax0.set_xlabel("Models")
-ax0.set_ylabel("Accuracy")
+ax0.set_ylabel("Error rate")
 ax0.set_xticks(np.arange(len(NAMES)))
 ax0.set_xticklabels(NAMES)
 ax0.legend()
 
 plt.figure(2)
-plt.title("Evolution of the accuracy along epochs, with std")
+plt.title("Evolution of the error rate along epochs, with std")
 plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
+plt.ylabel("Error rate")
 plt.legend()
