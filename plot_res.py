@@ -8,13 +8,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#Load data
+# ----- Loading ----- #
 test_e = np.genfromtxt('test_perf_e.txt', delimiter=' ')
 train_e = np.genfromtxt('train_perf_e.txt', delimiter=' ')
 test = np.genfromtxt('test_perf.txt', delimiter=' ')
 train = np.genfromtxt('train_perf.txt', delimiter=' ')
 
-#Apply stats
+# ----- Stats ----- #
 test_e_m = np.mean(test_e,axis=0)
 test_e_s = np.std(test_e,axis=0)
 train_e_m = np.mean(train_e,axis=0)
@@ -24,6 +24,7 @@ test_s = np.std(test)
 train_m = np.mean(train)
 train_s = np.std(train)
 
+# ----- Plot ----- #
 #Plot normal perf
 print("Mean train perf is "+str(train_m*100)+"% with std "+str(train_s*100)+"%")
 print("Mean test perf is "+str(test_m*100)+"% with std "+str(test_s*100)+"%")
