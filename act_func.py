@@ -6,7 +6,7 @@
 
 # ----- Libraries ----- #
 from modules import Module
-from torch import set_grad_enabled
+from torch import set_grad_enabled, empty
 set_grad_enabled(False)
 
 # ----- Actiavtion definitions ----- #
@@ -32,15 +32,18 @@ class ReLU(Module):
         
     def __init__(self):
         self.name = "ReLU Activation Layer"
-    
+        self.output = None
+
     def forward(self, input):
-        input[input<0] = 0 
-        return input
+        input[input<0] = 0
+        self.output = input
+        return self.output
 
     def backward(self, gradwrtoutput):
-        gradwrtoutput[gradwrtoutput < 0] = 0
-        gradwrtoutput[gradwrtoutput >= 0] = 1
-        return gradwrtoutput
+        out = empty(size=(self.output.shape))
+        out[self.output < 0] = 0
+        out[self.output >= 0] = 1
+        return out*gradwrtoutput
     
 #Sigmoid
 class Sigmoid(Module):

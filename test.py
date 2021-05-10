@@ -19,7 +19,6 @@ import modules
 N = 1000           #nb of dats in both train and test dataset
 N_EPOCHS = 30      #nb of epoch for the train
 eta0 = 1e-1        #learning rate
-batch_size = 1     #batch size (nb of gradient computation before changing the weight)
 N_ITER = 10        #nb of iter to compute mean and std
 BOOL_SAVE = False  #to save or not the data
 VERBOSE = True
