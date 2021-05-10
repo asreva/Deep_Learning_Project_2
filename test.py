@@ -17,8 +17,8 @@ import modules
 
 # ----- Parameters ----- #
 N = 1000           #nb of dats in both train and test dataset
-N_EPOCHS = 20      #nb of epoch for the train
-eta0 = 1e-2        #learning rate
+N_EPOCHS = 30      #nb of epoch for the train
+eta0 = 1e-1        #learning rate
 batch_size = 1     #batch size (nb of gradient computation before changing the weight)
 N_ITER = 10        #nb of iter to compute mean and std
 BOOL_SAVE = False  #to save or not the data
@@ -80,7 +80,7 @@ for iter in range(N_ITER):
             improvement = (train_perf_e[epoch-1]-err_train/N)
             if VERBOSE:
                 print("train improvement  = {:.2%}".format(improvement))
-            if improvement < 0.02:
+            if improvement < 0.01:
                 improv_count += 1
             if improv_count >= 2:
                 eta /= 2

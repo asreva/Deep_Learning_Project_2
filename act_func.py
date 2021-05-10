@@ -24,7 +24,7 @@ class Tanh(Module):
         return self.output 
 
     def backward(self, gradwrtoutput):
-        return 4 * (self.output.exp() + self.output.mul(-1).exp()).pow(-2) * gradwrtoutput
+        return (1-self.output.tanh().pow(2))*gradwrtoutput
 
 #ReLU
 class ReLU(Module):
