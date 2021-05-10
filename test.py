@@ -20,8 +20,9 @@ N = 1000           #nb of dats in both train and test dataset
 N_EPOCHS = 30      #nb of epoch for the train
 eta0 = 1e-1        #learning rate
 N_ITER = 10        #nb of iter to compute mean and std
-BOOL_SAVE = False  #to save or not the data
+BOOL_SAVE = True  #to save or not the data
 VERBOSE = True
+AUTO_LR_REDUCE = False
 
 # ----- Log tables ----- #
 train_perf = []     #final perf train of each iter
@@ -53,7 +54,8 @@ for iter in range(N_ITER):
     seq.append(layers.FCLayer(25, 1, True))
     seq.append(act.Sigmoid())
     
-    seq.names()
+    if VERBOSE:
+        seq.names()
     
     #Train the network
     for epoch in range(N_EPOCHS): #for each epoch
@@ -75,7 +77,7 @@ for iter in range(N_ITER):
             print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
             print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
 
-        if epoch > 1: #decrease eta if stagnation
+        if epoch > 1 and AUTO_LR_REDUCE: #decrease eta if stagnation
             improvement = (train_perf_e[epoch-1]-err_train/N)
             if VERBOSE:
                 print("train improvement  = {:.2%}".format(improvement))

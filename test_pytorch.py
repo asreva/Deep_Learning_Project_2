@@ -13,14 +13,11 @@ import torch.optim as optim
 from torch import set_grad_enabled
 set_grad_enabled(True)
 
-
-
-
 # ----- Parameters ----- #
 N = 1000            #nb of dats in both train and test dataset
-N_EPOCHS = 20      #nb of epoch for the train
-eta = 1e-2          #learning rate
-N_ITER = 1         #nb of iter to compute mean and std
+N_EPOCHS = 30      #nb of epoch for the train
+eta = 1e-1          #learning rate
+N_ITER = 10         #nb of iter to compute mean and std
 BOOL_SAVE = True    #to save or not the data
 
 # ----- Log tables ----- #
@@ -28,6 +25,12 @@ train_perf = []     #final perf train of each iter
 test_perf = []      #fian perf test of each iter
 train_perf_i_e = [] #perf train of each iter along epochs
 test_perf_i_e = []  #perf test of each iter along epochs
+
+# ----- Functions ----- #
+def init_weights(m):    
+    if type(m) == nn.Linear:
+        m.weight.data.normal_(mean=0, std=1)  
+        m.bias.data.normal_(mean=0, std=1)  
 
 # ----- Main ----- #
 #repeat for stat info
@@ -48,6 +51,7 @@ for iter in range(N_ITER):
         nn.Linear(25,1),
         nn.Sigmoid()
     )
+    seq.apply(init_weights)
     
     optimizer = optim.SGD(seq.parameters(), lr=eta)
     criterion = nn.MSELoss()
@@ -59,7 +63,7 @@ for iter in range(N_ITER):
         for i in range(N): #for each point
             #predict the output and backward the loss
             pred_train = seq(train_points[i, :])
-            loss = criterion(pred_train, train_labels[i])
+            loss = criterion(pred_train, train_labels[i].view(-1))
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -105,21 +109,21 @@ for iter in range(N_ITER):
     
 #save in file
 if BOOL_SAVE:
-    with open('train_perf_torch.txt', 'w+') as f:
+    with open('train_perf.txt', 'w+') as f:
         for val in train_perf:
             f.write(str(val)+" ")
         
-    with open('test_perf_torch.txt', 'w+') as f:
+    with open('test_perf.txt', 'w+') as f:
         for val in test_perf:
             f.write(str(val)+" ")
             
-    with open('train_perf_e_torch.txt', 'w+') as f:
+    with open('train_perf_e.txt', 'w+') as f:
         for l in train_perf_i_e:
             for val in l:
                 f.write(str(val)+" ")
             f.write("\n")
         
-    with open('test_perf_e_torch.txt', 'w+') as f:
+    with open('test_perf_e.txt', 'w+') as f:
         for l in test_perf_i_e:
             for val in l:
                 f.write(str(val)+" ")
