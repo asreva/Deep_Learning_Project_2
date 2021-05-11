@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 plt.close("all")
 
 # ----- Constants ----- #
-PATH = "ours_no_lr"+"/"
+PATH = "pytorch"+"/"
 
 # ----- Loading ----- #
 test_e = np.genfromtxt(PATH+'test_perf_e.txt', delimiter=' ')

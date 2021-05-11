@@ -11,8 +11,8 @@ plt.close("all")
 import sys
 
 # ----- Parameters ----- #
-PATHS = ["ours/","ours_no_lr/","pytorch/"]
-NAMES = ["Ours", "Ours (no lr modifs)","Pytorch"]
+PATHS = ["ours_no_lr/","pytorch/"]
+NAMES = ["Ours (without lr update)","Pytorch"]
 COLORS = ["green","blue","red","black"]
 
 fig0, ax0 = plt.subplots()

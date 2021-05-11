@@ -15,4 +15,4 @@ def MSE(value, target):
     return ((value - target)**2).sum()/value.shape[0]
 
 def dMSE(value, target):
-    return 2 * (value - target)
+    return 2 * (value - target)/value.shape[0]

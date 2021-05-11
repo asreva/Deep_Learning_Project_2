@@ -38,17 +38,23 @@ def generate_circle_dataset(N=1000):
 """ Plot to verify the implementation
 import matplotlib.pyplot as plt
 import torch
+plt.close("all")
 w, x, y, z = generate_circle_dataset()
 x = x.type(torch.BoolTensor)
 z = z.type(torch.BoolTensor)
 fig1 = plt.figure() #train 
-plt.plot(w[x,0],w[x,1], linestyle='None', markersize = 1.0,marker='o', color="green")
-plt.plot(w[~x,0],w[~x,1], linestyle='None', markersize = 1.0,marker='o', color="red")
+plt.plot(w[x,0],w[x,1], linestyle='None', markersize = 1.0,marker='o', color="green", label="1")
+plt.plot(w[~x,0],w[~x,1], linestyle='None', markersize = 1.0,marker='o', color="red", label="0")
 plt.gca().add_patch(plt.Circle((X_OFF, Y_OFF), R, color='grey'))
+plt.title("Training dataset")
+plt.legend(loc="upper right")
 fig2 = plt.figure() #test 
-plt.plot(y[z,0],y[z,1], linestyle='None', markersize = 1.0,marker='o', color="green")
-plt.plot(y[~z,0],y[~z,1], linestyle='None', markersize = 1.0,marker='o', color="red")
+plt.plot(y[z,0],y[z,1], linestyle='None', markersize = 1.0,marker='o', color="green", label="1")
+plt.plot(y[~z,0],y[~z,1], linestyle='None', markersize = 1.0,marker='o', color="red", label="0")
 plt.gca().add_patch(plt.Circle((X_OFF, Y_OFF), R, color='grey'))
+plt.title("Testing dataset")
+plt.legend(loc="upper right")
 """
+
 
 
