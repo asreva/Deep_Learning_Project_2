@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @authors:   Isaac Dinis & Ivan-Daniel Sievering
-@aim:       Test the manual framework on a very simple example (the one in the report)
+@aim:       Test the manual framework on a very simple example (code in the report)
 """
 
 # ----- Libraries ----- #

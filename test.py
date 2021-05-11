@@ -14,23 +14,26 @@ import act_func as act
 import loss
 import layers
 import modules
+from lr_adapter import LearningRateAdapter
 
 # ----- Parameters ----- #
-N = 1000           #nb of dats in both train and test dataset
-N_EPOCHS = 30      #nb of epoch for the train
-eta0 = 1e-1        #learning rate
-N_ITER = 10        #nb of iter to compute mean and std
-BOOL_SAVE = True  #to save or not the data
-VERBOSE = True
-AUTO_LR_REDUCE = False
+N = 1000                #nb of dats in both train and test dataset
+N_EPOCHS = 30           #nb of epoch for the train
+eta0 = 1e-1             #initial learning rate
+N_ITER = 10             #nb of iter to compute mean and std
+AUTO_LR_REDUCE = True   #enable auto lr updater
+IMPROVEMENT_TH = 0.01   #min improvement th to increase counter
+LR_RED = 0.5            #lr update factor 
+MAX_LR_CNT = 2          #value that the counter needs to reach before lr update
+BOOL_SAVE = True        #to save or not the data
+VERBOSE = True          #display information
+
 
 # ----- Log tables ----- #
 train_perf = []     #final perf train of each iter
 test_perf = []      #fian perf test of each iter
 train_perf_i_e = [] #perf train of each iter along epochs
 test_perf_i_e = []  #perf test of each iter along epochs
-
-improv_count = 0    #used to reduce eta in case of stagnation
 
 # ----- Main ----- #
 #repeat for stat info
@@ -40,7 +43,8 @@ for iter in range(N_ITER):
         print("\nIter: "+str(iter)+"\n")
     
     #Get data
-    train_points, train_labels, test_points, test_labels = datasets.generate_circle_dataset(N)
+    train_points, train_labels, test_points, test_labels = \
+                                                datasets.generate_circle_dataset(N)
     train_perf_e = [] #perf train along epochs
     test_perf_e = []  #perf test along epochs
     
@@ -57,6 +61,10 @@ for iter in range(N_ITER):
     if VERBOSE:
         seq.names()
     
+    #Define the lr adapter if needed
+    if AUTO_LR_REDUCE:
+        lr_adapter = LearningRateAdapter(eta0, IMPROVEMENT_TH, LR_RED, MAX_LR_CNT)
+    
     #Train the network
     for epoch in range(N_EPOCHS): #for each epoch
         err_train = 0
@@ -64,14 +72,17 @@ for iter in range(N_ITER):
         for i in range(N): #for each point
             #predict the output and backward the loss
             pred_train = seq.forward(train_points[i, :])
-            seq.backward(loss.dMSE(pred_train.view(1, -1), train_labels[i].view(1, -1)))
+            seq.backward(loss.dMSE(pred_train.view(1, -1), \
+                                   train_labels[i].view(1, -1)))
             seq.grad_step(eta)
             
             #check performance
-            if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
+            if (train_labels[i] and pred_train <= 0.5) \
+                                    or (not train_labels[i] and pred_train >= 0.5):
                 err_train += 1
             pred_test = seq.forward(test_points[i, :])
-            if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
+            if (test_labels[i] and pred_test <= 0.5) \
+                                    or (not test_labels[i] and pred_test >= 0.5):
                 err_test += 1
         if VERBOSE:
             print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
@@ -81,11 +92,7 @@ for iter in range(N_ITER):
             improvement = (train_perf_e[epoch-1]-err_train/N)
             if VERBOSE:
                 print("train improvement  = {:.2%}".format(improvement))
-            if improvement < 0.01:
-                improv_count += 1
-            if improv_count >= 2:
-                eta /= 2
-                improv_count = 0
+            eta = lr_adapter.step(improvement)
 
         train_perf_e.append(err_train / N)
         test_perf_e.append(err_test / N)
@@ -97,7 +104,8 @@ for iter in range(N_ITER):
         #predict the output
         pred_test = seq.forward(test_points[i, :])
         #add errors
-        if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
+        if (test_labels[i] and pred_test <= 0.5) \
+                                or (not test_labels[i] and pred_test >= 0.5):
             err_test += 1
     
     #on train
@@ -106,7 +114,8 @@ for iter in range(N_ITER):
         #predict the output
         pred_train = seq.forward(train_points[i, :])
         #add errors
-        if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
+        if (train_labels[i] and pred_train <= 0.5) \
+                                or (not train_labels[i] and pred_train >= 0.5):
             err_train += 1
     
     #save and print
