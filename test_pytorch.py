@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @authors:   Isaac Dinis & Ivan-Daniel Sievering
-@aim:       Test the manual framework on a simple example
+@aim:       Test the simple example with PyTorch
 """
 
 # ----- Libraries ----- #
@@ -15,19 +15,20 @@ set_grad_enabled(True)
 
 # ----- Parameters ----- #
 N = 1000            #nb of dats in both train and test dataset
-N_EPOCHS = 30      #nb of epoch for the train
+N_EPOCHS = 30       #nb of epoch for the train
 eta = 1e-1          #learning rate
 N_ITER = 10         #nb of iter to compute mean and std
 BOOL_SAVE = True    #to save or not the data
 
 # ----- Log tables ----- #
 train_perf = []     #final perf train of each iter
-test_perf = []      #fian perf test of each iter
+test_perf = []      #final perf test of each iter
 train_perf_i_e = [] #perf train of each iter along epochs
 test_perf_i_e = []  #perf test of each iter along epochs
 
 # ----- Functions ----- #
 def init_weights(m):    
+    #Init all the FC layers with normal init as our implementation
     if type(m) == nn.Linear:
         m.weight.data.normal_(mean=0, std=1)  
         m.bias.data.normal_(mean=0, std=1)  
@@ -38,7 +39,8 @@ for iter in range(N_ITER):
     print("\nIter: "+str(iter)+"\n")
     
     #Get data
-    train_points, train_labels, test_points, test_labels = datasets.generate_circle_dataset(N)
+    train_points, train_labels, test_points, test_labels = \
+        datasets.generate_circle_dataset(N)
     train_perf_e = [] #perf train along epochs
     test_perf_e = []  #perf test along epochs
     
@@ -53,6 +55,7 @@ for iter in range(N_ITER):
     )
     seq.apply(init_weights)
     
+    #Define the optimisation
     optimizer = optim.SGD(seq.parameters(), lr=eta)
     criterion = nn.MSELoss()
     
@@ -61,7 +64,7 @@ for iter in range(N_ITER):
         err_train = 0
         err_test = 0
         for i in range(N): #for each point
-            #predict the output and backward the loss
+            #predict the output, backward the loss and change the wheights
             pred_train = seq(train_points[i, :])
             loss = criterion(pred_train, train_labels[i].view(-1))
             optimizer.zero_grad()
@@ -69,12 +72,15 @@ for iter in range(N_ITER):
             optimizer.step()
             
             #check performance
-            if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
+            if (train_labels[i] and pred_train <= 0.5) \
+                    or (not train_labels[i] and pred_train >= 0.5):
                 err_train += 1
             pred_test = seq(test_points[i, :])
-            if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
+            if (test_labels[i] and pred_test <= 0.5) \
+                    or (not test_labels[i] and pred_test >= 0.5):
                 err_test += 1
-                
+        
+        #Print and save epoch performance
         print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
         print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
         train_perf_e.append(err_train / N)
@@ -87,16 +93,17 @@ for iter in range(N_ITER):
         #predict the output
         pred_test = seq(test_points[i, :])
         #add errors
-        if (test_labels[i] and pred_test <= 0.5) or (not test_labels[i] and pred_test >= 0.5):
+        if (test_labels[i] and pred_test <= 0.5) \
+                or (not test_labels[i] and pred_test >= 0.5):
             err_test += 1
-    
     #on train
     err_train = 0     
     for i in range(N): #for each point
         #predict the output
         pred_train = seq(train_points[i, :])
         #add errors
-        if (train_labels[i] and pred_train <= 0.5) or (not train_labels[i] and pred_train >= 0.5):
+        if (train_labels[i] and pred_train <= 0.5) \
+                or (not train_labels[i] and pred_train >= 0.5):
             err_train += 1
     
     #save and print

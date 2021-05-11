@@ -17,9 +17,9 @@ Y_OFF = 0.5                     #disk Y offset
 
 # ----- Functions ----- #
 def generate_circle_dataset(N=1000):
-    #generates a training and a testing dataset with N points randomly generated btw 0 and 1
-    #points outside of the disk centered at [0.5 0.5] with a radius 1/sqrt(2*pi) are classified
-    #as 0, the points inside (or on the boundary) as 1
+    #generates a train and a test dataset with N points generated uniformly btw 0 and 1
+    #points outside of the disk centered at [0.5 0.5] with a radius 1/sqrt(2*pi)
+    #are classified as 0, the points inside (or on the boundary) as 1
     
     #Create points
     test_points = empty(1000, 2).uniform_()

@@ -20,9 +20,9 @@ def layer_init(X, init="Normal", param1=None, param2=None, input_w=0, output_w=0
     #   - X:        the tensor to initialise (maybe W or b)
     #   - init:     the type of init (Normal, Uniform or Xavier)
     #   - param1/2  the parameters of the init (for normal it is mean and std, 
-    #               for uniform it is min and max value, no param for xavier)
-    #   - input_w:      size of the input (nb input connections)
-    #   - output_w:     size of the output (nb output connections)
+    #                   for uniform it is min and max value, no param for xavier)
+    #   - input_w:  size of the input (nb input connections)
+    #   - output_w: size of the output (nb output connections)
     
     if init=="Normal":
         if param1==None:
@@ -52,12 +52,14 @@ class FCLayer(Module):
     #   - input_w:      size of the input (nb input connections)
     #   - output_w:     size of the output (nb output connections)
     #   - bias_bool:    boolean, if a bias is added to the output of the FC
-    #   - init:     the type of init (Normal, Uniform or Xavier)
-    #   - param1/2  the parameters of the init (for normal it is mean and std, 
-    #               for uniform it is min and max value, no param for xavier)
+    #   - init:         the type of init (Normal, Uniform or Xavier)
+    #   - param1/2      the parameters of the init (for normal it is mean and std, 
+    #                       for uniform it is min and max value, no param for xavier)
     
-    def __init__(self, input_w, output_w, bias_bool, init="Normal", param1=None, param2=None):
-        self.name = "FC Layer with input "+str(input_w)+", output "+str(output_w)+" and bias set to "+str(bias_bool)
+    def __init__(self, input_w, output_w, bias_bool, init="Normal", param1=None, 
+                 param2=None):
+        self.name = "FC Layer with input "+str(input_w)+", output "+str(output_w)+\
+                    " and bias set to "+str(bias_bool)
         self.bias_bool = bias_bool  
         self.input = empty(size=(input_w,1))
         self.output = empty(size=(output_w,1))
