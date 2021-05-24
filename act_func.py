@@ -9,7 +9,7 @@ from modules import Module
 from torch import set_grad_enabled, empty
 set_grad_enabled(False)
 
-# ----- Actiavtion definitions ----- #
+# ----- Activation definitions ----- #
 
 #Tanh
 class Tanh(Module):

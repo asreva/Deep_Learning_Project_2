@@ -25,7 +25,7 @@ AUTO_LR_REDUCE = True   #enable auto lr updater
 IMPROVEMENT_TH = 0.01   #min improvement th to increase counter
 LR_RED = 0.5            #lr update factor 
 MAX_LR_CNT = 2          #value that the counter needs to reach before lr update
-BOOL_SAVE = True        #to save or not the data
+BOOL_SAVE = False       #to save or not the data
 VERBOSE = True          #display information
 
 
@@ -39,8 +39,7 @@ test_perf_i_e = []  #perf test of each iter along epochs
 #repeat for stat info
 for iter in range(N_ITER):
     eta = eta0  # reset learning rate
-    if VERBOSE:
-        print("\nIter: "+str(iter)+"\n")
+
     
     #Get data
     train_points, train_labels, test_points, test_labels = \
@@ -58,13 +57,14 @@ for iter in range(N_ITER):
     seq.append(layers.FCLayer(25, 1, True))
     seq.append(act.Sigmoid())
     
-    if VERBOSE:
+    if VERBOSE and iter == 0:
         seq.names()
     
     #Define the lr adapter if needed
     if AUTO_LR_REDUCE:
         lr_adapter = LearningRateAdapter(eta0, IMPROVEMENT_TH, LR_RED, MAX_LR_CNT)
-    
+    if VERBOSE:
+        print("\nIter: "+str(iter))
     #Train the network
     for epoch in range(N_EPOCHS): #for each epoch
         err_train = 0
@@ -84,14 +84,9 @@ for iter in range(N_ITER):
             if (test_labels[i] and pred_test <= 0.5) \
                                     or (not test_labels[i] and pred_test >= 0.5):
                 err_test += 1
-        if VERBOSE:
-            print("train epoch {} err = {:.2%}".format(epoch, err_train / N))
-            print("test epoch {} err = {:.2%}".format(epoch, err_test / N))
 
         if epoch > 1 and AUTO_LR_REDUCE: #decrease eta if stagnation
             improvement = (train_perf_e[epoch-1]-err_train/N)
-            if VERBOSE:
-                print("train improvement  = {:.2%}".format(improvement))
             eta = lr_adapter.step(improvement)
 
         train_perf_e.append(err_train / N)
@@ -124,9 +119,9 @@ for iter in range(N_ITER):
     train_perf_i_e.append(train_perf_e)
     test_perf_i_e.append(test_perf_e)
     if VERBOSE:
-        print("\nFinal train {} err = {:.2%}".format(epoch, err_train / N))
-        print("Final test {} err = {:.2%}".format(epoch, err_test / N))
-    
+        print("train epoch at {}  = {:.2%}".format(epoch+1, err_train / N))
+        print("test error at epoch {} = {:.2%}".format(epoch+1, err_test / N))
+
 #save in file
 if BOOL_SAVE:
     with open('train_perf.txt', 'w+') as f:
